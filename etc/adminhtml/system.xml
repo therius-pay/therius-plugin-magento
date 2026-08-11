@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment">
+            <group id="therius" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Therius Payments</label>
+                <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Title</label>
+                </field>
+                <field id="description" translate="label" type="textarea" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Description</label>
+                </field>
+                <field id="merchant_code" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Merchant Code</label>
+                    <comment>Optional. The Merchant Code identifier for this account.</comment>
+                </field>
+                <field id="test_mode" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Test Mode</label>
+                    <comment>Place the payment gateway in test mode using the Sandbox key pair below.</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <field id="sandbox_heading" translate="label" type="label" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sandbox (Test) Credentials</label>
+                    <frontend_model>Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
+                </field>
+                <field id="test_publishable_key" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Test Publishable Key</label>
+                </field>
+                <field id="test_private_key" translate="label" type="obscure" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Test Private Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+                <field id="test_checkout_config_id" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Test Checkout Config ID</label>
+                    <comment>Optional. Controls which payment methods display dynamically from your Dashboard.</comment>
+                </field>
+                <field id="test_webhook_secret" translate="label" type="obscure" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Test Webhook Signing Secret</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <comment>The signing secret shown when you configure the webhook in Sandbox mode.</comment>
+                </field>
+
+                <field id="live_heading" translate="label" type="label" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Live (Production) Credentials</label>
+                    <frontend_model>Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
+                </field>
+                <field id="publishable_key" translate="label" type="text" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Live Publishable Key</label>
+                </field>
+                <field id="private_key" translate="label" type="obscure" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Live Private Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+                <field id="live_checkout_config_id" translate="label" type="text" sortOrder="140" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Live Checkout Config ID</label>
+                    <comment>Optional. Controls which payment methods display dynamically from your Dashboard.</comment>
+                </field>
+                <field id="webhook_secret" translate="label" type="obscure" sortOrder="150" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Live Webhook Signing Secret</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <comment>The signing secret shown when you configure the webhook in Production mode.</comment>
+                </field>
+
+                <field id="webhook_info" translate="label" type="note" sortOrder="160" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Webhook Endpoint</label>
+                    <comment><![CDATA[Add this URL as a webhook endpoint in the Therius Dashboard (Developers &rarr; Webhooks): <code>https://&lt;your-store&gt;/therius/webhook/index</code>. Subscribe to at least payment.captured, payment.refused, payment.refunded, payment.cancelled and payment.chargeback.]]></comment>
+                </field>
+
+                <field id="sort_order" translate="label" type="text" sortOrder="170" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sort Order</label>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

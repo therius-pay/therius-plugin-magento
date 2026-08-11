@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Payment:etc/config.xsd">
+    <default>
+        <payment>
+            <therius>
+                <active>0</active>
+                <model>Therius\Payment\Model\Therius</model>
+                <title>Credit Card (Therius)</title>
+                <order_status>pending</order_status>
+                <payment_action>authorize_capture</payment_action>
+                <can_authorize>1</can_authorize>
+                <can_capture>1</can_capture>
+                <can_capture_partial>0</can_capture_partial>
+                <can_refund>1</can_refund>
+                <can_refund_invoice_partial>1</can_refund_invoice_partial>
+                <can_void>0</can_void>
+                <can_use_checkout>1</can_use_checkout>
+                <can_use_internal>0</can_use_internal>
+                <is_gateway>1</is_gateway>
+                <sort_order>1</sort_order>
+                <test_mode>1</test_mode>
+            </therius>
+        </payment>
+    </default>
+</config>

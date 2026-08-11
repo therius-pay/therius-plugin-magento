@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Whitelists the Therius API domains for Magento's built-in Content-Security-
+Policy module (Magento_Csp, on by default since 2.4.4). Without this, every
+merchant on a standard Magento install — not just this test environment —
+would have the Therius SDK script, its XHR calls, and its hosted card-field
+iframes silently blocked by CSP with no error surfaced anywhere in the PHP
+layer, only in the browser console as a CSP violation.
+-->
+<csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp:etc/csp_whitelist.xsd">
+    <policies>
+        <policy id="script-src">
+            <values>
+                <value id="therius_api" type="host">api.therius.io</value>
+                <value id="therius_api_sandbox" type="host">api-sandbox.therius.io</value>
+            </values>
+        </policy>
+        <policy id="connect-src">
+            <values>
+                <value id="therius_api" type="host">api.therius.io</value>
+                <value id="therius_api_sandbox" type="host">api-sandbox.therius.io</value>
+            </values>
+        </policy>
+        <policy id="frame-src">
+            <values>
+                <value id="therius_api" type="host">api.therius.io</value>
+                <value id="therius_api_sandbox" type="host">api-sandbox.therius.io</value>
+            </values>
+        </policy>
+        <policy id="img-src">
+            <values>
+                <value id="therius_api" type="host">api.therius.io</value>
+                <value id="therius_api_sandbox" type="host">api-sandbox.therius.io</value>
+            </values>
+        </policy>
+    </policies>
+</csp_whitelist>

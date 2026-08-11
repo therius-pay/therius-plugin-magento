@@ -1,0 +1,28 @@
+{
+    "name": "therius/module-payment",
+    "description": "Therius Payment Orchestration for Magento 2.",
+    "type": "magento2-module",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Therius",
+            "homepage": "https://therius.io"
+        }
+    ],
+    "require": {
+        "php": "~8.1.0||~8.2.0||~8.3.0",
+        "magento/framework": "*",
+        "magento/module-payment": "*",
+        "magento/module-sales": "*",
+        "magento/module-checkout": "*",
+        "magento/module-quote": "*"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Therius\\Payment\\": ""
+        }
+    }
+}
