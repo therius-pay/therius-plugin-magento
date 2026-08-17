@@ -223,7 +223,7 @@ define([
                             return;
                         }
                         if (response.error) {
-                            reject(new Error(response.error));
+                            reject(self.buildDeclineError(response.error, response.recoveryAction));
                             return;
                         }
 
@@ -246,10 +246,29 @@ define([
                             reject(new Error('Payment could not be completed.'));
                         }
                     })
-                    .fail(function () {
-                        reject(new Error('Payment could not be completed.'));
+                    .fail(function (jqXHR) {
+                        // jQuery routes any non-2xx response (Purchase.php's decline
+                        // branch returns 422) through .fail(), never .done() — the
+                        // response.error check above is unreachable for a real
+                        // decline. responseJSON carries the same {error,
+                        // recoveryAction} body Purchase.php sends either way.
+                        var body = (jqXHR && jqXHR.responseJSON) || {};
+                        reject(self.buildDeclineError(body.error || 'Payment could not be completed.', body.recoveryAction));
                     });
             });
+        },
+
+        /**
+         * Constructs the SDK's DeclineError when a recoveryAction is present
+         * (activates CheckoutWidget's built-in smart recovery — retry/
+         * switch_method/terminal), falling back to a plain Error otherwise.
+         * Mirrors therius-plugin-shopware's therius-payment.plugin.js.
+         */
+        buildDeclineError: function (message, recoveryAction) {
+            if (recoveryAction && window.TheriusSDK && window.TheriusSDK.DeclineError) {
+                return new window.TheriusSDK.DeclineError(message, recoveryAction);
+            }
+            return new Error(message);
         },
 
         /**

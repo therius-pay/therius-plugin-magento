@@ -122,8 +122,10 @@ class Purchase implements HttpPostActionInterface, CsrfAwareActionInterface
         }
 
         if ($apiResult['status'] >= 400 || empty($data['paymentCode']) || !in_array($data['status'] ?? '', self::ACCEPTED_STATUSES, true)) {
-            $message = $data['error']['message'] ?? __('Payment declined.');
-            return $result->setHttpResponseCode(422)->setData(['error' => (string) $message]);
+            return $result->setHttpResponseCode(422)->setData([
+                'error' => Client::extractErrorMessage($data),
+                'recoveryAction' => Client::extractRecoveryAction($data),
+            ]);
         }
 
         // Picked up by Model\Therius::doPurchase() once Magento places the

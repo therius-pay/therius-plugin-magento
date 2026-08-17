@@ -332,6 +332,41 @@ class Client
         ];
     }
 
+    /**
+     * Extracts a human-readable message from a Therius API response body.
+     * HTTP-level errors return a flat string ({"error": "..."}); a genuine
+     * decline is a 200/4xx with the reason under refusalCode.reason, not
+     * error.message — there is no error.message shape. Mirrors
+     * therius-plugin-woocommerce's extract_error_message() field-for-field
+     * (see plugin-developer skill Section 10, lesson: grep the reference
+     * plugin for field names rather than retyping from memory).
+     */
+    public static function extractErrorMessage(array $data, ?string $fallback = null): string
+    {
+        if (isset($data['error']) && is_string($data['error'])) {
+            return $data['error'];
+        }
+        if (isset($data['refusalCode']['reason']) && is_string($data['refusalCode']['reason'])) {
+            return $data['refusalCode']['reason'];
+        }
+        return $fallback ?? (string) __('Payment declined.');
+    }
+
+    /**
+     * Companion to extractErrorMessage() — surfaces refusalCode.recoveryAction
+     * ('retry' | 'switch_method' | 'terminal') so therius-method.js can
+     * reject with the SDK's DeclineError instead of a plain Error, letting
+     * CheckoutWidget's built-in smart recovery activate. Defaults to
+     * 'switch_method', the safest generic fallback.
+     */
+    public static function extractRecoveryAction(array $data): string
+    {
+        if (isset($data['refusalCode']['recoveryAction']) && is_string($data['refusalCode']['recoveryAction'])) {
+            return $data['refusalCode']['recoveryAction'];
+        }
+        return 'switch_method';
+    }
+
     private function headersToAssoc(array $rawHeaders): array
     {
         $assoc = [];
