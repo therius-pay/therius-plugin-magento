@@ -100,6 +100,9 @@ class Finalize implements HttpPostActionInterface, CsrfAwareActionInterface
         // real order right after this call returns, same as the
         // synchronous-purchase path in Controller\Checkout\Purchase.
         $this->checkoutSession->setData('therius_payment_code', $data['paymentCode']);
+        if (!empty($data['id'])) {
+            $this->checkoutSession->setData('therius_payment_id', $data['id']);
+        }
         $this->checkoutSession->setData('therius_status', $data['status']);
         // therius_order_code is already set from Purchase; leave it as-is.
 

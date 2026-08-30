@@ -248,11 +248,13 @@ class Client
     }
 
     /**
-     * POST /v1/payment/refund
+     * POST /v1/payment/{id}/refund — the payment is addressed by its
+     * server-issued Therius id in the URL; orderCode / paymentCode are not
+     * accepted in the body for this call.
      */
-    public function refund(array $body, string $idempotencyKey, ?int $storeId = null): array
+    public function refund(string $paymentId, array $body, string $idempotencyKey, ?int $storeId = null): array
     {
-        return $this->post('/v1/payment/refund', $body, $idempotencyKey, $storeId);
+        return $this->post('/v1/payment/' . rawurlencode($paymentId) . '/refund', $body, $idempotencyKey, $storeId);
     }
 
     /**

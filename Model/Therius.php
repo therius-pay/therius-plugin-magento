@@ -131,12 +131,14 @@ class Therius extends AbstractMethod
         $sessionOrderCode = $this->checkoutSession->getData('therius_order_code');
         if ($sessionOrderCode && $sessionOrderCode === $order->getIncrementId()) {
             $paymentCode = (string) $this->checkoutSession->getData('therius_payment_code');
+            $paymentId = (string) $this->checkoutSession->getData('therius_payment_id');
             $status = (string) $this->checkoutSession->getData('therius_status');
             $this->checkoutSession->unsetData('therius_payment_code');
+            $this->checkoutSession->unsetData('therius_payment_id');
             $this->checkoutSession->unsetData('therius_order_code');
             $this->checkoutSession->unsetData('therius_status');
 
-            $this->applyPurchaseResult($payment, $order, $paymentCode, $status);
+            $this->applyPurchaseResult($payment, $order, $paymentCode, $paymentId, $status);
             return $this;
         }
 
@@ -178,17 +180,17 @@ class Therius extends AbstractMethod
             throw new LocalizedException(__($message));
         }
 
-        $this->applyPurchaseResult($payment, $order, (string) $data['paymentCode'], (string) $data['status']);
+        $this->applyPurchaseResult($payment, $order, (string) $data['paymentCode'], (string) ($data['id'] ?? ''), (string) $data['status']);
 
         return $this;
     }
 
     /**
-     * Applies an already-known purchase outcome (paymentCode + status) to
+     * Applies an already-known purchase outcome (paymentCode + id + status) to
      * the order/payment. Shared by both the session-prefetched path and the
      * direct-call fallback in doPurchase() above.
      */
-    private function applyPurchaseResult(InfoInterface $payment, $order, string $paymentCode, string $status): void
+    private function applyPurchaseResult(InfoInterface $payment, $order, string $paymentCode, string $paymentId, string $status): void
     {
         if ($paymentCode === '') {
             throw new LocalizedException(__('Payment declined.'));
@@ -202,6 +204,12 @@ class Therius extends AbstractMethod
         // WooCommerce reference plugin's own explicit comment on this.
         $payment->setTransactionId($paymentCode);
         $payment->setAdditionalInformation('therius_payment_code', $paymentCode);
+        // The Therius payment id (UUID) is the handle for refund / capture /
+        // cancel — POST /v1/payment/{id}/refund. Stored here; an order placed
+        // before this field existed falls back to resolvePaymentId() below.
+        if ($paymentId !== '') {
+            $payment->setAdditionalInformation('therius_payment_id', $paymentId);
+        }
         $payment->setAdditionalInformation('therius_status', $status);
         $payment->setIsTransactionClosed(false);
 
@@ -244,7 +252,42 @@ class Therius extends AbstractMethod
     }
 
     /**
-     * POST /v1/payment/refund. A successful call only means Therius accepted
+     * Resolve the Therius payment id (UUID) for a payment — the handle for the
+     * lifecycle endpoints (POST /v1/payment/{id}/refund|capture|cancel).
+     *
+     * Returns the id stored at purchase time; for a payment placed before that
+     * additional-info key existed, resolves it once from the stored
+     * paymentCode via the keyless GET /v1/payment/inquiry/{code} (which also
+     * returns the id) and caches it. Returns '' when it cannot be determined.
+     */
+    private function resolvePaymentId(InfoInterface $payment, int $storeId): string
+    {
+        $id = (string) $payment->getAdditionalInformation('therius_payment_id');
+        if ($id !== '') {
+            return $id;
+        }
+
+        $paymentCode = (string) $payment->getAdditionalInformation('therius_payment_code');
+        if ($paymentCode === '') {
+            return '';
+        }
+
+        try {
+            $result = $this->client->inquiry($paymentCode, $storeId);
+        } catch (\Throwable $e) {
+            return '';
+        }
+        if (($result['status'] ?? 500) >= 400 || empty($result['data']['id'])) {
+            return '';
+        }
+
+        $id = (string) $result['data']['id'];
+        $payment->setAdditionalInformation('therius_payment_id', $id);
+        return $id;
+    }
+
+    /**
+     * POST /v1/payment/{id}/refund. A successful call only means Therius accepted
      * the request — the order should not be treated as fully refunded until
      * the payment.refunded webhook confirms it (see process_webhook_event()
      * in Controller\Webhook\Index). Magento's own credit-memo flow already
@@ -258,9 +301,13 @@ class Therius extends AbstractMethod
         $currency = $order->getOrderCurrencyCode();
         $reason = $payment->getCreditMemo() ? (string) $payment->getCreditMemo()->getIncrementId() : '';
 
+        $paymentId = $this->resolvePaymentId($payment, $storeId);
+        if ($paymentId === '') {
+            throw new LocalizedException(__('Could not determine the Therius payment id for this order.'));
+        }
+
         $body = [
             'key' => $this->client->getPrivateKey($storeId),
-            'orderCode' => $order->getIncrementId(),
             'amount' => [
                 'value' => $this->client->toMinorUnits((float) $amount, $currency),
                 'currency' => $currency,
@@ -281,7 +328,7 @@ class Therius extends AbstractMethod
         $idempotencyKey = $idempotencyCache ?: bin2hex(random_bytes(16));
         $payment->setAdditionalInformation('therius_refund_idem_' . $dedupeKey, $idempotencyKey);
 
-        $result = $this->client->refund($body, $idempotencyKey, $storeId);
+        $result = $this->client->refund($paymentId, $body, $idempotencyKey, $storeId);
         $data = $result['data'];
 
         if ($result['status'] >= 400) {

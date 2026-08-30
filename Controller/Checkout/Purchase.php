@@ -134,6 +134,9 @@ class Purchase implements HttpPostActionInterface, CsrfAwareActionInterface
         // matters. therius_order_code is already set above (unconditionally,
         // before the actionRequired branch could return early).
         $this->checkoutSession->setData('therius_payment_code', $data['paymentCode']);
+        if (!empty($data['id'])) {
+            $this->checkoutSession->setData('therius_payment_id', $data['id']);
+        }
         $this->checkoutSession->setData('therius_status', $data['status']);
 
         return $result->setData(['success' => true]);
