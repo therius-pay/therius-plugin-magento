@@ -307,7 +307,6 @@ class Therius extends AbstractMethod
         }
 
         $body = [
-            'key' => $this->client->getPrivateKey($storeId),
             'amount' => [
                 'value' => $this->client->toMinorUnits((float) $amount, $currency),
                 'currency' => $currency,

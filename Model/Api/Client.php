@@ -133,7 +133,6 @@ class Client
                 'currency' => $currency,
                 'exponent' => $this->currencyExponent($currency),
             ],
-            'key' => $this->getPrivateKey($storeId),
         ];
 
         $merchantCode = $this->getMerchantCode($storeId);
