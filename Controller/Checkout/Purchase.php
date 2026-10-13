@@ -37,6 +37,39 @@ class Purchase implements HttpPostActionInterface, CsrfAwareActionInterface
     ) {
     }
 
+    /**
+     * browserInfo for the purchase body: the client IP of this request plus the browser data the
+     * checkout JS collected. Only the known keys are taken, with their types enforced, so a
+     * tampered post cannot add anything else.
+     */
+    private function browserInfo(mixed $raw): array
+    {
+        $info = [];
+        $ip = method_exists($this->request, 'getClientIp') ? $this->request->getClientIp(true) : '';
+        if (is_string($ip) && $ip !== '') {
+            $info['ipAddress'] = $ip;
+        }
+        if (!is_array($raw)) {
+            return $info;
+        }
+        foreach (['userAgent', 'acceptHeader', 'language'] as $key) {
+            if (isset($raw[$key]) && is_string($raw[$key]) && $raw[$key] !== '') {
+                $info[$key] = $raw[$key];
+            }
+        }
+        foreach (['colorDepth', 'screenWidth', 'screenHeight', 'timeZoneOffset'] as $key) {
+            if (isset($raw[$key]) && is_numeric($raw[$key])) {
+                $info[$key] = (int) $raw[$key];
+            }
+        }
+        foreach (['javaEnabled', 'javascriptEnabled'] as $key) {
+            if (isset($raw[$key])) {
+                $info[$key] = (bool) $raw[$key];
+            }
+        }
+        return $info;
+    }
+
     public function execute()
     {
         $result = $this->resultJsonFactory->create();
@@ -92,7 +125,8 @@ class Purchase implements HttpPostActionInterface, CsrfAwareActionInterface
                 $orderCode,
                 $storeId,
                 $quote->getCustomerEmail(),
-                $ddcSessionId
+                $ddcSessionId,
+                $this->browserInfo($requestData['browserInfo'] ?? null)
             );
         } catch (LocalizedException $e) {
             return $result->setHttpResponseCode(422)->setData(['error' => $e->getMessage()]);

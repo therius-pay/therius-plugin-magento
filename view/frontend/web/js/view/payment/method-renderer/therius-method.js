@@ -272,11 +272,31 @@ define([
         },
 
         /**
+         * The shopper's browser data as EMV 3DS wants it — Redsys, Nuvei and Adyen embedded 3DS
+         * refuse the payment without it. The Accept header is the standard document value (a page
+         * cannot read its own); timeZoneOffset is minutes, UTC minus local.
+         */
+        collectBrowserInfo: function () {
+            var scr = window.screen || {};
+            return {
+                userAgent: navigator.userAgent || '',
+                acceptHeader: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                language: navigator.language || '',
+                colorDepth: scr.colorDepth || 24,
+                screenWidth: scr.width || 0,
+                screenHeight: scr.height || 0,
+                timeZoneOffset: new Date().getTimezoneOffset(),
+                javaEnabled: false,
+                javascriptEnabled: true
+            };
+        },
+
+        /**
          * POSTs to /therius/checkout/purchase (Controller\Checkout\Purchase)
          * — the pre-order call described in handleSubmit() above.
          */
         callPreOrderPurchase: function (methodType, payload, ddcSessionId) {
-            var body = { methodType: methodType };
+            var body = { methodType: methodType, browserInfo: this.collectBrowserInfo() };
 
             if (methodType === 'card') {
                 body.nonce = payload.nonce;

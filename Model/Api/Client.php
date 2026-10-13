@@ -125,7 +125,8 @@ class Client
         string $orderCode,
         ?int $storeId,
         ?string $customerEmail = null,
-        ?string $ddcSessionId = null
+        ?string $ddcSessionId = null,
+        array $browserInfo = []
     ): array {
         $body = [
             'amount' => [
@@ -134,6 +135,11 @@ class Client
                 'exponent' => $this->currencyExponent($currency),
             ],
         ];
+        // The shopper's browser data (screen, language, time zone, ...) — providers that run EMV
+        // 3DS themselves (Redsys, Nuvei, Adyen embedded) refuse the payment without it.
+        if ($browserInfo !== []) {
+            $body['browserInfo'] = $browserInfo;
+        }
 
         $merchantCode = $this->getMerchantCode($storeId);
         if ($merchantCode !== '') {
@@ -196,8 +202,8 @@ class Client
                 // too so the mandate isn't silently sent empty. IP address
                 // needs no equivalent handling: the API falls back to the
                 // connecting client's own IP server-side when unset.
-                if (!empty($apmData['userAgent'])) {
-                    $body['browserInfo'] = ['userAgent' => (string) $apmData['userAgent']];
+                if (!empty($apmData['userAgent']) && empty($body['browserInfo']['userAgent'])) {
+                    $body['browserInfo']['userAgent'] = (string) $apmData['userAgent'];
                 }
                 $body['apm'] = $apmData;
                 break;
