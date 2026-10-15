@@ -9,7 +9,7 @@ use Magento\Store\Model\ScopeInterface;
 
 /**
  * Thin wrapper around the Therius API. Mirrors the WooCommerce reference
- * plugin's purchase/refund/session calls field-for-field so behaviour stays
+ * plugin's purchase/refund/session calls field-for-field so behavior stays
  * identical across platforms (see plugin-developer skill, Section 3).
  */
 class Client

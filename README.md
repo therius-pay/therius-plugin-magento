@@ -46,7 +46,7 @@ The `/v1/payment/purchase` call tells you the outcome at the moment of charge, b
    ```
    Configure one webhook in **Sandbox** mode and one in **Production** mode if you use both.
 2. Copy the signing secret shown for each environment into the module's **Test Webhook Signing Secret** / **Live Webhook Signing Secret** fields.
-3. Subscribe to at least: `payment.captured`, `payment.refused`, `payment.refunded`, `payment.cancelled`, `payment.chargeback`.
+3. Subscribe to at least: `payment.captured`, `payment.refused`, `payment.refunded`, `payment.canceled`, `payment.chargeback`.
 
 Without this configured, orders left `pending_payment` (async fraud/issuer review) will never resolve, and refunds/chargebacks issued from the Therius dashboard won't be reflected on the Magento order. Every incoming webhook call is verified against the signing secret (`X-Therius-Signature`, HMAC-SHA256) before anything is applied — unsigned or mis-signed requests are rejected with `401`.
 

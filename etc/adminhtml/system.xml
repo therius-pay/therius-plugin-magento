@@ -68,7 +68,7 @@
 
                 <field id="webhook_info" translate="label" type="note" sortOrder="160" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Webhook Endpoint</label>
-                    <comment><![CDATA[Add this URL as a webhook endpoint in the Therius Dashboard (Developers &rarr; Webhooks): <code>https://&lt;your-store&gt;/therius/webhook/index</code>. Subscribe to at least payment.captured, payment.refused, payment.refunded, payment.cancelled and payment.chargeback.]]></comment>
+                    <comment><![CDATA[Add this URL as a webhook endpoint in the Therius Dashboard (Developers &rarr; Webhooks): <code>https://&lt;your-store&gt;/therius/webhook/index</code>. Subscribe to at least payment.captured, payment.refused, payment.refunded, payment.canceled and payment.chargeback.]]></comment>
                 </field>
 
                 <field id="sort_order" translate="label" type="text" sortOrder="170" showInDefault="1" showInWebsite="1" showInStore="1">

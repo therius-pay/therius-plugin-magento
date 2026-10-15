@@ -115,9 +115,9 @@ class Index implements HttpPostActionInterface, CsrfAwareActionInterface
                 }
                 break;
 
-            case 'payment.cancelled':
+            case 'payment.canceled':
                 $order->setState(Order::STATE_CANCELED)->setStatus('canceled');
-                $order->addCommentToStatusHistory(__('Therius: payment cancelled (confirmed via webhook).'));
+                $order->addCommentToStatusHistory(__('Therius: payment canceled (confirmed via webhook).'));
                 break;
 
             case 'payment.chargeback':
