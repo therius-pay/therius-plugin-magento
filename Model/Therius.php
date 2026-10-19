@@ -257,7 +257,7 @@ class Therius extends AbstractMethod
      *
      * Returns the id stored at purchase time; for a payment placed before that
      * additional-info key existed, resolves it once from the stored
-     * paymentCode via the keyless GET /v1/payment/inquiry/{code} (which also
+     * paymentCode via GET /v1/payment/inquiry/{code} (private-key authenticated; it also
      * returns the id) and caches it. Returns '' when it cannot be determined.
      */
     private function resolvePaymentId(InfoInterface $payment, int $storeId): string

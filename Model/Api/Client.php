@@ -290,11 +290,9 @@ class Client
         $headers = [
             'Authorization: Bearer ' . $this->getPrivateKey($storeId),
         ];
-        // GET /payment/inquiry takes no request body to derive environment
-        // from (unlike purchase/refund's sk_sandbox_/sk_live_ key prefix
-        // convention) — without this header it defaults to production and a
-        // sandbox payment simply isn't found. Same as the WooCommerce
-        // reference's finalize_from_action_complete().
+        // GET /payment/inquiry is authenticated with the private key above and
+        // takes its environment from the key prefix; the X-Environment header
+        // is ignored by the API. Kept only for older API deployments.
         if ($this->isTestMode($storeId)) {
             $headers[] = 'X-Environment: sandbox';
         }
