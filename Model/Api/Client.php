@@ -14,6 +14,8 @@ use Magento\Store\Model\ScopeInterface;
  */
 class Client
 {
+    public const PRESENTER_CODE = 'magento';
+
     private const PATH_PREFIX = 'payment/therius/';
 
     /**
@@ -289,6 +291,7 @@ class Client
 
         $headers = [
             'Authorization: Bearer ' . $this->getPrivateKey($storeId),
+            'Therius-Presenter-Code: ' . self::PRESENTER_CODE,
         ];
         // GET /payment/inquiry is authenticated with the private key above and
         // takes its environment from the key prefix; the X-Environment header
@@ -318,6 +321,7 @@ class Client
         $headers = [
             'Authorization: Bearer ' . $this->getPrivateKey($storeId),
             'Content-Type: application/json',
+            'Therius-Presenter-Code: ' . self::PRESENTER_CODE,
         ];
         if ($idempotencyKey !== null) {
             $headers[] = 'Idempotency-Key: ' . $idempotencyKey;
